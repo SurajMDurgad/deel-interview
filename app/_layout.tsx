@@ -3,8 +3,8 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
-import { ThemeProvider, useTheme } from '@/src/context/ThemeContext';
 import { PayslipProvider } from '@/src/context/PayslipContext';
+import { ThemeProvider, useTheme } from '@/src/context/ThemeContext';
 
 function RootLayoutNav() {
   const { colorScheme } = useTheme();
@@ -18,7 +18,7 @@ function RootLayoutNav() {
           options={{
             headerShown: true,
             title: 'Payslip Details',
-            headerBackTitle: 'Back',
+            headerBackButtonDisplayMode: 'minimal',
           }}
         />
       </Stack>
