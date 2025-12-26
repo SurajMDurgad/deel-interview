@@ -206,11 +206,11 @@ export default function PayslipDetailsScreen() {
             accessibilityHint="Saves the payslip to your device"
           >
             {isDownloading ? (
-              <ActivityIndicator color="#ffffff" size="small" />
+              <ActivityIndicator color={colorScheme === 'dark' ? '#151718' : '#ffffff'} size="small" />
             ) : (
               <>
                 <Text style={styles.actionButtonIcon}>⬇️</Text>
-                <Text style={styles.actionButtonText}>
+                <Text style={[styles.actionButtonText, { color: colorScheme === 'dark' ? '#151718' : '#ffffff' }]}>
                   Download Payslip
                 </Text>
               </>
