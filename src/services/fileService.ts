@@ -3,7 +3,7 @@ import { Directory, File, Paths } from 'expo-file-system';
 import * as FileSystemLegacy from 'expo-file-system/legacy';
 import * as IntentLauncher from 'expo-intent-launcher';
 import * as Sharing from 'expo-sharing';
-import { Alert, Platform } from 'react-native';
+import { Alert, Linking, Platform } from 'react-native';
 import { Payslip, PayslipFileType } from '../types/payslip';
 
 // Import the bundled PDF asset
@@ -120,6 +120,10 @@ export async function downloadPayslip(payslip: Payslip, forceRedownload = false)
         // Delete old file to force re-download
         await file.delete();
       } else {
+        // File already exists - on iOS, open share sheet to save to Files
+        if (Platform.OS === 'ios') {
+          return await saveToFilesOnIOS(payslip, file.uri);
+        }
         return {
           success: true,
           message: 'File already downloaded',
@@ -133,6 +137,11 @@ export async function downloadPayslip(payslip: Payslip, forceRedownload = false)
     
     // Verify the file was created
     if (await checkPathExists(file.uri)) {
+      // On iOS, open share sheet which allows saving to Files app
+      if (Platform.OS === 'ios') {
+        return await saveToFilesOnIOS(payslip, file.uri);
+      }
+      
       // On Android, we need to save to public storage for the user to see it
       if (Platform.OS === 'android') {
         try {
@@ -190,6 +199,60 @@ export async function downloadPayslip(payslip: Payslip, forceRedownload = false)
       message: `Download failed: ${errorMessage}`,
     };
   }
+}
+
+/**
+ * Handle saving to Files app on iOS
+ * Saves the file and directly opens Files app (skips share sheet)
+ */
+async function saveToFilesOnIOS(
+  payslip: Payslip,
+  filePath: string
+): Promise<FileOperationResult> {
+  const extension = getFileExtension(payslip.file.type);
+  const fileName = `payslip-${payslip.id}.${extension}`;
+
+  // File is already saved in app's Documents folder
+  // Offer to open Files app directly (no share sheet)
+  return new Promise((resolve) => {
+    Alert.alert(
+      'Download Complete',
+      `Payslip saved as "${fileName}". Open Files app to view it in the app\'s folder.`,
+      [
+        {
+          text: 'OK',
+          style: 'cancel',
+          onPress: () => {
+            resolve({
+              success: true,
+              message: 'Payslip downloaded successfully',
+              filePath,
+            });
+          },
+        },
+        {
+          text: 'Open Files',
+          onPress: async () => {
+            try {
+              // Open Files app on iOS
+              await Linking.openURL('shareddocuments://');
+              resolve({
+                success: true,
+                message: 'Opening Files app...',
+                filePath,
+              });
+            } catch {
+              resolve({
+                success: true,
+                message: 'Payslip saved. Open the Files app to view it.',
+                filePath,
+              });
+            }
+          },
+        },
+      ]
+    );
+  });
 }
 
 /**

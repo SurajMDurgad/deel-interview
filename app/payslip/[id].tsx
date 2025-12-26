@@ -38,8 +38,13 @@ export default function PayslipDetailsScreen() {
     setIsDownloading(true);
     try {
       // Force re-download to replace any old cached files
+      // On iOS, the download function shows its own alert with option to open Files app
+      // On Android, it opens folder picker and saves there
       const result = await downloadPayslip(payslip, true);
-      showFileOperationAlert(result, 'Download');
+      // Only show alert if it failed (iOS shows its own success alert)
+      if (!result.success) {
+        showFileOperationAlert(result, 'Download');
+      }
     } finally {
       setIsDownloading(false);
     }
