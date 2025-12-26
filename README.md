@@ -1,50 +1,128 @@
-# Welcome to your Expo app 👋
+# Deel Payslips App 📄
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile application for viewing, downloading, and managing employee payslips. Built with Expo for a seamless cross-platform experience on iOS and Android.
 
-## Get started
+---
 
-1. Install dependencies
+## 📱 Features
 
-   ```bash
-   npm install
-   ```
+- **Payslip List** — Browse all payslips with date-based filtering and sorting
+- **Search & Filter** — Filter payslips by ID, month, or year
+- **Sorting** — Sort by newest or oldest first
+- **Payslip Details** — View detailed information for each payslip
+- **Download** — Save payslips to device storage (with Android SAF support)
+- **Preview** — Open payslips using native viewers/share sheet
+- **Dark Mode** — Automatic dark/light theme support
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## 🛠 Tech Stack & Architecture Choices
 
-In the output, you'll find options to open the app in a
+### Framework
+| Technology | Version | Why |
+|------------|---------|-----|
+| **Expo** | SDK 54 | Managed workflow for faster development, OTA updates, and simplified native configuration |
+| **React Native** | 0.81.5 | Cross-platform mobile development with native performance |
+| **React** | 19.1.0 | Latest React with improved performance and concurrent features |
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Navigation
+| Library | Purpose |
+|---------|---------|
+| **Expo Router** | File-based routing for intuitive navigation structure |
+| **React Navigation** | Underlying navigation primitives and screen transitions |
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### State Management
+| Approach | Why |
+|----------|-----|
+| **React Context** | Lightweight state management for payslip data, filtering, and sorting without additional dependencies |
 
-## Get a fresh project
+### File Handling
+| Library | Purpose |
+|---------|---------|
+| **expo-file-system** | Read/write files to device storage |
+| **expo-sharing** | Native share sheet for file preview on iOS |
+| **expo-intent-launcher** | Open files with appropriate apps on Android |
+| **expo-asset** | Bundle and manage static assets |
 
-When you're ready, run:
+### Developer Experience
+| Tool | Purpose |
+|------|---------|
+| **TypeScript** | Type safety and better IDE support |
+| **ESLint** | Code linting and style enforcement |
+
+### Why Expo over React Native CLI?
+
+1. **Faster Setup** — No need to configure Xcode/Android Studio build systems manually
+2. **OTA Updates** — Push updates without app store submissions
+3. **Managed Native Modules** — Common native features work out of the box
+4. **New Architecture Ready** — `newArchEnabled: true` for Fabric and TurboModules
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** >= 18.x (recommended: use `nvm`)
+- **npm** or **yarn**
+- **iOS Development** (macOS only):
+  - Xcode 15+
+  - Xcode Command Line Tools: `xcode-select --install`
+  - CocoaPods: `sudo gem install cocoapods`
+- **Android Development**:
+  - Android Studio (latest stable)
+  - Android SDK (API 34+)
+  - Java 17 (comes with Android Studio)
+  - Set `ANDROID_HOME` environment variable
+
+### Installation
 
 ```bash
-npm run reset-project
+# Clone the repository
+git clone https://github.com/SurajMDurgad/deel-interview
+cd deel-interview
+
+# Install dependencies
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Running the App
 
-## Learn more
+#### iOS Simulator
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+# Start Metro bundler and run on iOS simulator
+npm run ios
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+#### Android Emulator
 
-## Join the community
+```bash
+# Start Metro bundler and run on Android emulator
+npm run android
+```
 
-Join our community of developers creating universal apps.
+#### Physical Devices
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+# Start the development server
+npx expo start
+
+# Scan QR code with:
+# - iOS: Camera app
+# - Android: Expo Go app
+```
+
+---
+
+## 📜 Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm start` | Start Expo development server |
+| `npm run ios` | Build and run on iOS simulator |
+| `npm run android` | Build and run on Android emulator |
+| `npm run web` | Start web version |
+| `npm run lint` | Run ESLint |
+| `npm run reset-project` | Reset to blank project template |
+
