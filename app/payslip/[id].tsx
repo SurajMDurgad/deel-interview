@@ -11,7 +11,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { usePayslips } from '@/src/context/PayslipContext';
 import {
   downloadPayslip,
@@ -23,7 +23,7 @@ import { formatDate, formatPeriod } from '@/src/utils/dateUtils';
 export default function PayslipDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colorScheme } = useTheme();
   const colors = Colors[colorScheme];
 
   const { getPayslipById } = usePayslips();

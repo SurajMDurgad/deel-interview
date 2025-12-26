@@ -1,20 +1,20 @@
-import React, { useCallback } from 'react';
-import { StyleSheet, View, FlatList, Text } from 'react-native';
 import { useRouter } from 'expo-router';
+import React, { useCallback } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { usePayslips } from '@/src/context/PayslipContext';
+import { Colors } from '@/constants/theme';
+import { FilterInput } from '@/src/components/FilterInput';
 import { PayslipCard } from '@/src/components/PayslipCard';
 import { SortPicker } from '@/src/components/SortPicker';
-import { FilterInput } from '@/src/components/FilterInput';
+import { usePayslips } from '@/src/context/PayslipContext';
+import { useTheme } from '@/src/context/ThemeContext';
 import { Payslip } from '@/src/types/payslip';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
 
 export default function PayslipListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colorScheme, toggleTheme, isDark } = useTheme();
   const colors = Colors[colorScheme];
 
   const {
@@ -81,9 +81,23 @@ export default function PayslipListScreen() {
         { backgroundColor: colors.background, paddingTop: insets.top },
       ]}
     >
-      {/* Screen Title */}
+      {/* Screen Title with Theme Toggle */}
       <View style={styles.titleContainer}>
         <Text style={[styles.title, { color: colors.text }]}>Payslips</Text>
+        <Pressable
+          onPress={toggleTheme}
+          style={({ pressed }) => [
+            styles.themeToggle,
+            {
+              backgroundColor: isDark ? '#2a2d2e' : '#f0f0f0',
+              opacity: pressed ? 0.7 : 1,
+            },
+          ]}
+          accessibilityLabel={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+          accessibilityRole="button"
+        >
+          <Text style={styles.themeToggleIcon}>{isDark ? '☀️' : '🌙'}</Text>
+        </Pressable>
       </View>
 
       <FlatList
@@ -109,10 +123,23 @@ const styles = StyleSheet.create({
   titleContainer: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   title: {
     fontSize: 32,
     fontWeight: '700',
+  },
+  themeToggle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  themeToggleIcon: {
+    fontSize: 22,
   },
   header: {
     marginBottom: 8,
@@ -151,4 +178,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-

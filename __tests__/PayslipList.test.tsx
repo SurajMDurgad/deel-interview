@@ -1,7 +1,7 @@
+import PayslipListScreen from '@/app/index';
 import { PayslipProvider } from '@/src/context/PayslipContext';
 import { Payslip } from '@/src/types/payslip';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import PayslipListScreen from '@/app/index';
 
 // Mock expo-router
 const mockPush = jest.fn();
@@ -14,11 +14,6 @@ jest.mock('expo-router', () => ({
 // Mock react-native-safe-area-context
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
-}));
-
-// Mock useColorScheme hook
-jest.mock('@/hooks/use-color-scheme', () => ({
-  useColorScheme: () => 'light',
 }));
 
 // Test data

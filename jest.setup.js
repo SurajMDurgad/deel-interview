@@ -34,6 +34,18 @@ jest.mock('@/hooks/use-color-scheme', () => ({
   useColorScheme: () => 'light',
 }));
 
+// Mock ThemeContext
+jest.mock('@/src/context/ThemeContext', () => ({
+  useTheme: () => ({
+    themeMode: 'light',
+    colorScheme: 'light',
+    setThemeMode: jest.fn(),
+    toggleTheme: jest.fn(),
+    isDark: false,
+  }),
+  ThemeProvider: ({ children }) => children,
+}));
+
 // Mock file service
 jest.mock('@/src/services/fileService', () => ({
   downloadPayslip: jest.fn().mockResolvedValue({ success: true }),

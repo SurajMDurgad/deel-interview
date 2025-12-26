@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Pressable, Text } from 'react-native';
 import { SortOrder } from '../types/payslip';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { Colors } from '@/constants/theme';
 
 interface SortPickerProps {
@@ -13,7 +13,7 @@ interface SortPickerProps {
  * Toggle button component for sorting payslips
  */
 export function SortPicker({ value, onChange }: SortPickerProps) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colorScheme } = useTheme();
   const colors = Colors[colorScheme];
 
   const options: { value: SortOrder; label: string }[] = [
@@ -51,7 +51,13 @@ export function SortPicker({ value, onChange }: SortPickerProps) {
               <Text
                 style={[
                   styles.buttonText,
-                  { color: isSelected ? '#ffffff' : colors.text },
+                  {
+                    color: isSelected
+                      ? colorScheme === 'dark'
+                        ? '#151718'
+                        : '#ffffff'
+                      : colors.text,
+                  },
                 ]}
               >
                 {option.label}

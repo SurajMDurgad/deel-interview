@@ -1,13 +1,13 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { PayslipProvider } from '@/src/context/PayslipContext';
-import { Payslip } from '@/src/types/payslip';
 import PayslipDetailsScreen from '@/app/payslip/[id]';
+import { PayslipProvider } from '@/src/context/PayslipContext';
 import {
   downloadPayslip,
   previewPayslip,
   showFileOperationAlert,
 } from '@/src/services/fileService';
+import { Payslip } from '@/src/types/payslip';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import React from 'react';
 
 // Mock expo-router
 const mockLocalSearchParams = jest.fn();
@@ -21,11 +21,6 @@ jest.mock('expo-router', () => ({
 // Mock react-native-safe-area-context
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
-}));
-
-// Mock useColorScheme hook
-jest.mock('@/hooks/use-color-scheme', () => ({
-  useColorScheme: () => 'light',
 }));
 
 // Mock file service

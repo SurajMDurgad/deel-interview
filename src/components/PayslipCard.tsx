@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Pressable, View, Text } from 'react-native';
 import { Payslip } from '../types/payslip';
 import { formatPeriod } from '../utils/dateUtils';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { Colors } from '@/constants/theme';
 
 interface PayslipCardProps {
@@ -14,7 +14,7 @@ interface PayslipCardProps {
  * Card component displaying a payslip summary
  */
 export function PayslipCard({ payslip, onPress }: PayslipCardProps) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colorScheme } = useTheme();
   const colors = Colors[colorScheme];
 
   const handlePress = () => {

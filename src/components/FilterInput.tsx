@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, TextInput, Pressable, Text } from 'react-native';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { Colors } from '@/constants/theme';
 
 interface FilterInputProps {
@@ -17,7 +17,7 @@ export function FilterInput({
   onChangeText,
   placeholder = 'Search by year, month, or ID...',
 }: FilterInputProps) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colorScheme } = useTheme();
   const colors = Colors[colorScheme];
 
   const handleClear = () => {
