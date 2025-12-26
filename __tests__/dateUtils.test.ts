@@ -1,10 +1,10 @@
 import {
+  compareDates,
   formatDate,
   formatPeriod,
-  getYear,
   getUniqueYears,
-  compareDates,
-} from './dateUtils';
+  getYear,
+} from '@/src/utils/dateUtils';
 
 describe('formatDate', () => {
   it('formats a valid ISO date correctly', () => {

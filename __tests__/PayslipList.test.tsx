@@ -1,7 +1,7 @@
 import { PayslipProvider } from '@/src/context/PayslipContext';
 import { Payslip } from '@/src/types/payslip';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import PayslipListScreen from '../index';
+import PayslipListScreen from '@/app/index';
 
 // Mock expo-router
 const mockPush = jest.fn();
@@ -263,3 +263,4 @@ describe('PayslipListScreen', () => {
     });
   });
 });
+

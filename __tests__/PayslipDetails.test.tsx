@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { PayslipProvider } from '@/src/context/PayslipContext';
 import { Payslip } from '@/src/types/payslip';
-import PayslipDetailsScreen from '../[id]';
+import PayslipDetailsScreen from '@/app/payslip/[id]';
 import {
   downloadPayslip,
   previewPayslip,
@@ -317,3 +317,4 @@ describe('PayslipDetailsScreen', () => {
     });
   });
 });
+

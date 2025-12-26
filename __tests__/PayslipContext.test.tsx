@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 import React from 'react';
-import { Payslip } from '../types/payslip';
-import { PayslipProvider, usePayslips, usePayslipYears } from './PayslipContext';
+import { Payslip } from '@/src/types/payslip';
+import { PayslipProvider, usePayslips, usePayslipYears } from '@/src/context/PayslipContext';
 
 // Test data
 const testPayslips: Payslip[] = [

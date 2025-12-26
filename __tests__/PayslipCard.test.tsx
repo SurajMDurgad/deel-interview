@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Payslip } from '../types/payslip';
-import { PayslipCard } from './PayslipCard';
+import { Payslip } from '@/src/types/payslip';
+import { PayslipCard } from '@/src/components/PayslipCard';
 
 // Mock the hooks
 jest.mock('@/hooks/use-color-scheme', () => ({
