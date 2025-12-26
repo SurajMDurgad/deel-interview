@@ -5,7 +5,6 @@ import { Payslip } from '@/src/types/payslip';
 import PayslipDetailsScreen from '../[id]';
 import {
   downloadPayslip,
-  isPayslipDownloaded,
   previewPayslip,
   showFileOperationAlert,
 } from '@/src/services/fileService';
@@ -14,12 +13,6 @@ import {
 const mockLocalSearchParams = jest.fn();
 jest.mock('expo-router', () => ({
   useLocalSearchParams: () => mockLocalSearchParams(),
-  useFocusEffect: (callback: () => void) => {
-    const React = require('react');
-    React.useEffect(() => {
-      callback();
-    }, []);
-  },
   Stack: {
     Screen: () => null,
   },
@@ -39,7 +32,6 @@ jest.mock('@/hooks/use-color-scheme', () => ({
 jest.mock('@/src/services/fileService', () => ({
   downloadPayslip: jest.fn().mockResolvedValue({ success: true }),
   previewPayslip: jest.fn().mockResolvedValue({ success: true }),
-  isPayslipDownloaded: jest.fn().mockResolvedValue(false),
   showFileOperationAlert: jest.fn(),
 }));
 
@@ -72,7 +64,6 @@ describe('PayslipDetailsScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockLocalSearchParams.mockReturnValue({ id: 'PS-2024-001' });
-    (isPayslipDownloaded as jest.Mock).mockResolvedValue(false);
   });
 
   describe('rendering with valid payslip', () => {
@@ -240,27 +231,15 @@ describe('PayslipDetailsScreen', () => {
   });
 
   describe('preview functionality', () => {
-    beforeEach(() => {
-      (isPayslipDownloaded as jest.Mock).mockResolvedValue(true);
-    });
-
-    it('enables preview button when payslip is downloaded', async () => {
+    it('preview button is enabled by default', () => {
       renderWithProvider();
 
-      await waitFor(() => {
-        const previewButton = screen.getByLabelText('Preview payslip');
-        expect(previewButton.props.accessibilityState?.disabled).toBeFalsy();
-      });
+      const previewButton = screen.getByLabelText('Preview payslip');
+      expect(previewButton.props.accessibilityState?.disabled).toBeFalsy();
     });
 
     it('calls previewPayslip when preview button is pressed', async () => {
       renderWithProvider();
-
-      // Wait for the button to be enabled (isDownloaded state updated)
-      await waitFor(() => {
-        const previewButton = screen.getByLabelText('Preview payslip');
-        expect(previewButton.props.accessibilityState?.disabled).toBeFalsy();
-      });
 
       const previewButton = screen.getByText('Preview Payslip');
       fireEvent.press(previewButton);
@@ -272,12 +251,6 @@ describe('PayslipDetailsScreen', () => {
 
     it('passes the correct payslip to previewPayslip', async () => {
       renderWithProvider();
-
-      // Wait for the button to be enabled (isDownloaded state updated)
-      await waitFor(() => {
-        const previewButton = screen.getByLabelText('Preview payslip');
-        expect(previewButton.props.accessibilityState?.disabled).toBeFalsy();
-      });
 
       const previewButton = screen.getByText('Preview Payslip');
       fireEvent.press(previewButton);

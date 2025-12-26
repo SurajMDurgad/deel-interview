@@ -1,8 +1,7 @@
-import { Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
-  AppState,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -16,7 +15,6 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { usePayslips } from '@/src/context/PayslipContext';
 import {
   downloadPayslip,
-  isPayslipDownloaded,
   previewPayslip,
   showFileOperationAlert,
 } from '@/src/services/fileService';
@@ -33,34 +31,6 @@ export default function PayslipDetailsScreen() {
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
-  const [isDownloaded, setIsDownloaded] = useState(false);
-
-  // Check if payslip is downloaded
-  const checkDownloadStatus = useCallback(() => {
-    if (payslip) {
-      isPayslipDownloaded(payslip).then(setIsDownloaded);
-    }
-  }, [payslip]);
-
-  // Check on focus
-  useFocusEffect(
-    useCallback(() => {
-      checkDownloadStatus();
-    }, [checkDownloadStatus])
-  );
-
-  // Check on app state change (e.g. returning from deleting file in another app)
-  React.useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (nextAppState === 'active') {
-        checkDownloadStatus();
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [checkDownloadStatus]);
 
   const handleDownload = useCallback(async () => {
     if (!payslip || isDownloading) return;
@@ -70,20 +40,17 @@ export default function PayslipDetailsScreen() {
       // Force re-download to replace any old cached files
       const result = await downloadPayslip(payslip, true);
       showFileOperationAlert(result, 'Download');
-      if (result.success) {
-        setIsDownloaded(true);
-      }
     } finally {
       setIsDownloading(false);
     }
   }, [payslip, isDownloading]);
 
   const handlePreview = useCallback(async () => {
-    if (!payslip || isPreviewing || !isDownloaded) return;
+    if (!payslip || isPreviewing) return;
 
     setIsPreviewing(true);
     try {
-      // Force re-download to ensure we have the correct PDF file
+      // previewPayslip will download the file if needed
       const result = await previewPayslip(payslip, true);
       if (!result.success) {
         showFileOperationAlert(result, 'Preview');
@@ -91,12 +58,17 @@ export default function PayslipDetailsScreen() {
     } finally {
       setIsPreviewing(false);
     }
-  }, [payslip, isPreviewing, isDownloaded]);
+  }, [payslip, isPreviewing]);
 
   if (!payslip) {
     return (
       <>
-        <Stack.Screen options={{ title: 'Payslip' }} />
+        <Stack.Screen
+        options={{
+          title: 'Payslip Details',
+          headerBackTitle: 'Back',
+        }}
+        />
         <View
           style={[
             styles.container,
@@ -260,17 +232,17 @@ export default function PayslipDetailsScreen() {
               styles.actionButton,
               styles.actionButtonSecondary,
               {
-                borderColor: isDownloaded ? colors.tint : colors.icon,
+                borderColor: colors.tint,
                 backgroundColor: pressed
                   ? colorScheme === 'dark'
                     ? '#2d3135'
                     : '#f5f5f5'
                   : 'transparent',
               },
-              (isPreviewing || !isDownloaded) && styles.actionButtonDisabled,
+              isPreviewing && styles.actionButtonDisabled,
             ]}
             onPress={handlePreview}
-            disabled={isPreviewing || !isDownloaded}
+            disabled={isPreviewing}
             accessibilityRole="button"
             accessibilityLabel="Preview payslip"
             accessibilityHint="Opens the payslip in a viewer"
@@ -283,7 +255,7 @@ export default function PayslipDetailsScreen() {
                 <Text
                   style={[
                     styles.actionButtonText,
-                    { color: isDownloaded ? colors.tint : colors.icon },
+                    { color: colors.tint },
                   ]}
                 >
                   Preview Payslip

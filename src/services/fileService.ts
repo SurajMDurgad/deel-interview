@@ -193,18 +193,6 @@ export async function downloadPayslip(payslip: Payslip, forceRedownload = false)
 }
 
 /**
- * Check if a payslip has been downloaded
- */
-export async function isPayslipDownloaded(payslip: Payslip): Promise<boolean> {
-  try {
-    const file = getPayslipFile(payslip);
-    return await checkPathExists(file.uri);
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Preview a payslip file using the native viewer
  */
 export async function previewPayslip(payslip: Payslip, forceRedownload = false): Promise<FileOperationResult> {
