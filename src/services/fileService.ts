@@ -1,6 +1,5 @@
 import { Asset } from 'expo-asset';
 import { Directory, File, Paths } from 'expo-file-system';
-import * as FileSystemLegacy from 'expo-file-system/legacy';
 import * as IntentLauncher from 'expo-intent-launcher';
 import * as Sharing from 'expo-sharing';
 import { Alert, Linking, Platform } from 'react-native';
@@ -63,26 +62,25 @@ function getPayslipFile(payslip: Payslip): File {
 }
 
 /**
- * Check if a path exists using legacy API
- */
-async function checkPathExists(uri: string): Promise<boolean> {
-  try {
-    const info = await FileSystemLegacy.getInfoAsync(uri);
-    return info.exists;
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Ensure the payslips directory exists
  */
 async function ensurePayslipsDirectory(): Promise<void> {
   const dir = getPayslipsDirectory();
-  const exists = await checkPathExists(dir.uri);
-  if (!exists) {
+  if (!dir.exists) {
     await dir.create();
   }
+}
+
+/**
+ * Convert base64 string to Uint8Array
+ */
+function base64ToBytes(base64: string): Uint8Array {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
 }
 
 /**
@@ -97,11 +95,11 @@ async function createSamplePayslipFile(_payslip: Payslip, file: File): Promise<v
     throw new Error('Failed to load bundled PDF asset');
   }
 
-  // Use legacy API to copy the file (more reliable)
-  await FileSystemLegacy.copyAsync({
-    from: asset.localUri,
-    to: file.uri,
-  });
+  // Create a File instance from the asset's local URI
+  const assetFile = new File(asset.localUri);
+  
+  // Copy the asset file to the destination
+  await assetFile.copy(file);
 }
 
 /**
@@ -114,8 +112,7 @@ export async function downloadPayslip(payslip: Payslip, forceRedownload = false)
     const file = getPayslipFile(payslip);
     
     // Check if file already exists
-    const exists = await checkPathExists(file.uri);
-    if (exists) {
+    if (file.exists) {
       if (forceRedownload) {
         // Delete old file to force re-download
         await file.delete();
@@ -136,7 +133,7 @@ export async function downloadPayslip(payslip: Payslip, forceRedownload = false)
     await createSamplePayslipFile(payslip, file);
     
     // Verify the file was created
-    if (await checkPathExists(file.uri)) {
+    if (file.exists) {
       // On iOS, open share sheet which allows saving to Files app
       if (Platform.OS === 'ios') {
         return await saveToFilesOnIOS(payslip, file.uri);
@@ -145,38 +142,31 @@ export async function downloadPayslip(payslip: Payslip, forceRedownload = false)
       // On Android, we need to save to public storage for the user to see it
       if (Platform.OS === 'android') {
         try {
-          const permissions = await FileSystemLegacy.StorageAccessFramework.requestDirectoryPermissionsAsync();
+          const pickedDirectory = await Directory.pickDirectoryAsync();
           
-          if (permissions.granted) {
-            // Read the file we just created internally
-            const base64 = await FileSystemLegacy.readAsStringAsync(file.uri, { 
-              encoding: FileSystemLegacy.EncodingType.Base64 
-            });
+          if (pickedDirectory) {
+            // Read the file we just created internally as base64
+            const base64 = await file.base64();
             
             const mimeType = getMimeType(payslip.file.type);
             const extension = getFileExtension(payslip.file.type);
             const fileName = `payslip-${payslip.id}.${extension}`;
             
             // Create file in the user-selected directory
-            const newUri = await FileSystemLegacy.StorageAccessFramework.createFileAsync(
-              permissions.directoryUri, 
-              fileName, 
-              mimeType
-            );
+            const newFile = await pickedDirectory.createFile(fileName, mimeType);
             
-            // Write data to the new file
-            await FileSystemLegacy.writeAsStringAsync(newUri, base64, { 
-              encoding: FileSystemLegacy.EncodingType.Base64 
-            });
+            // Write data to the new file (convert base64 to bytes)
+            const bytes = base64ToBytes(base64);
+            await newFile.write(bytes);
             
             return {
               success: true,
               message: 'Payslip saved to device',
-              filePath: newUri,
+              filePath: newFile.uri,
             };
           }
         } catch (error) {
-          console.warn('Android SAF error:', error);
+          console.warn('Android directory picker error:', error);
           // Fall back to returning the internal file result
         }
       }
@@ -265,7 +255,7 @@ export async function previewPayslip(payslip: Payslip, forceRedownload = false):
     const file = getPayslipFile(payslip);
     
     // Check if the internal file exists
-    const exists = await checkPathExists(file.uri);
+    const exists = file.exists;
     
     if (!exists || forceRedownload) {
       // Download the file if it doesn't exist
@@ -275,7 +265,7 @@ export async function previewPayslip(payslip: Payslip, forceRedownload = false):
       await createSamplePayslipFile(payslip, file);
       
       // Verify the file was created
-      if (!await checkPathExists(file.uri)) {
+      if (!file.exists) {
         return {
           success: false,
           message: 'Could not prepare file for preview',
@@ -305,7 +295,7 @@ export async function previewPayslip(payslip: Payslip, forceRedownload = false):
       }
     } else if (Platform.OS === 'android') {
       // On Android, download to user-selected folder and open the file
-      return await previewPayslipOnAndroid(payslip, filePath, mimeType);
+      return await previewPayslipOnAndroid(payslip, file, mimeType);
     }
     
     // Web fallback or unsupported platform
@@ -336,44 +326,37 @@ export async function previewPayslip(payslip: Payslip, forceRedownload = false):
  */
 async function previewPayslipOnAndroid(
   payslip: Payslip,
-  internalFilePath: string,
+  internalFile: File,
   mimeType: string
 ): Promise<FileOperationResult> {
   try {
-    // Request directory permission from user (same as download flow)
-    const permissions = await FileSystemLegacy.StorageAccessFramework.requestDirectoryPermissionsAsync();
+    // Request directory permission from user using modern API
+    const pickedDirectory = await Directory.pickDirectoryAsync();
     
-    if (!permissions.granted) {
+    if (!pickedDirectory) {
       return {
         success: false,
         message: 'Storage permission is required to save and open the file',
       };
     }
 
-    // Read the internal file
-    const base64 = await FileSystemLegacy.readAsStringAsync(internalFilePath, {
-      encoding: FileSystemLegacy.EncodingType.Base64,
-    });
+    // Read the internal file as base64
+    const base64 = await internalFile.base64();
 
     const extension = getFileExtension(payslip.file.type);
     const fileName = `payslip-${payslip.id}.${extension}`;
 
     // Create file in the user-selected directory
-    const savedFileUri = await FileSystemLegacy.StorageAccessFramework.createFileAsync(
-      permissions.directoryUri,
-      fileName,
-      mimeType
-    );
+    const savedFile = await pickedDirectory.createFile(fileName, mimeType);
 
-    // Write data to the new file
-    await FileSystemLegacy.writeAsStringAsync(savedFileUri, base64, {
-      encoding: FileSystemLegacy.EncodingType.Base64,
-    });
+    // Write data to the new file (convert base64 to bytes)
+    const bytes = base64ToBytes(base64);
+    await savedFile.write(bytes);
 
     // Now open the file with an appropriate viewer
     try {
       await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-        data: savedFileUri,
+        data: savedFile.uri,
         flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
         type: mimeType,
       });
@@ -381,7 +364,7 @@ async function previewPayslipOnAndroid(
       return {
         success: true,
         message: 'File saved and opened successfully',
-        filePath: savedFileUri,
+        filePath: savedFile.uri,
       };
     } catch (openError) {
       console.warn('Could not open file directly:', openError);
@@ -389,14 +372,14 @@ async function previewPayslipOnAndroid(
       // If we can't open directly, use share sheet as fallback
       const isSharingAvailable = await Sharing.isAvailableAsync();
       if (isSharingAvailable) {
-        await Sharing.shareAsync(savedFileUri, {
+        await Sharing.shareAsync(savedFile.uri, {
           mimeType,
           dialogTitle: `Open ${fileName}`,
         });
         return {
           success: true,
           message: 'File saved. Choose an app to open it.',
-          filePath: savedFileUri,
+          filePath: savedFile.uri,
         };
       }
       
@@ -404,7 +387,7 @@ async function previewPayslipOnAndroid(
       return {
         success: true,
         message: `File saved to selected folder as ${fileName}`,
-        filePath: savedFileUri,
+        filePath: savedFile.uri,
       };
     }
   } catch (error) {
@@ -413,14 +396,14 @@ async function previewPayslipOnAndroid(
     // Fallback: use share sheet with internal file
     const isSharingAvailable = await Sharing.isAvailableAsync();
     if (isSharingAvailable) {
-      await Sharing.shareAsync(internalFilePath, {
+      await Sharing.shareAsync(internalFile.uri, {
         mimeType,
         dialogTitle: `Payslip ${payslip.id}`,
       });
       return {
         success: true,
         message: 'Choose an option to save or open the file',
-        filePath: internalFilePath,
+        filePath: internalFile.uri,
       };
     }
     
@@ -438,9 +421,7 @@ export async function deleteDownloadedPayslip(payslip: Payslip): Promise<FileOpe
   try {
     const file = getPayslipFile(payslip);
     
-    const exists = await checkPathExists(file.uri);
-    
-    if (!exists) {
+    if (!file.exists) {
       return {
         success: true,
         message: 'File was already deleted',
