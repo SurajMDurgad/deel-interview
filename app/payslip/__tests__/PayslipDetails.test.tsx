@@ -196,18 +196,19 @@ describe('PayslipDetailsScreen', () => {
       });
     });
 
-    it('shows alert after successful download', async () => {
+    it('does not show alert after successful download (iOS shows its own)', async () => {
       renderWithProvider();
 
       const downloadButton = screen.getByText('Download Payslip');
       fireEvent.press(downloadButton);
 
       await waitFor(() => {
-        expect(showFileOperationAlert).toHaveBeenCalledWith(
-          { success: true },
-          'Download'
-        );
+        expect(downloadPayslip).toHaveBeenCalled();
       });
+
+      // showFileOperationAlert should NOT be called on success
+      // because iOS shows its own success alert
+      expect(showFileOperationAlert).not.toHaveBeenCalled();
     });
 
     it('shows alert after failed download', async () => {
@@ -258,7 +259,7 @@ describe('PayslipDetailsScreen', () => {
       await waitFor(() => {
         expect(previewPayslip).toHaveBeenCalledWith(
           expect.objectContaining({ id: 'PS-2024-001' }),
-          true
+          false
         );
       });
     });
