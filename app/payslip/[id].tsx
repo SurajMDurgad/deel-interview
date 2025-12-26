@@ -50,8 +50,9 @@ export default function PayslipDetailsScreen() {
 
     setIsPreviewing(true);
     try {
-      // previewPayslip will download the file if needed
-      const result = await previewPayslip(payslip, true);
+      // previewPayslip will download the file if needed, then open share sheet on Android
+      // This allows the user to save to a folder, open with a viewer, or share
+      const result = await previewPayslip(payslip, false);
       if (!result.success) {
         showFileOperationAlert(result, 'Preview');
       }

@@ -197,17 +197,31 @@ export async function downloadPayslip(payslip: Payslip, forceRedownload = false)
  */
 export async function previewPayslip(payslip: Payslip, forceRedownload = false): Promise<FileOperationResult> {
   try {
-    // First, ensure the file is downloaded
-    const downloadResult = await downloadPayslip(payslip, forceRedownload);
+    // Ensure the payslips directory and internal file exist
+    await ensurePayslipsDirectory();
+    const file = getPayslipFile(payslip);
     
-    if (!downloadResult.success || !downloadResult.filePath) {
-      return {
-        success: false,
-        message: downloadResult.message || 'Could not prepare file for preview',
-      };
+    // Check if the internal file exists
+    const exists = await checkPathExists(file.uri);
+    
+    if (!exists || forceRedownload) {
+      // Download the file if it doesn't exist
+      if (exists && forceRedownload) {
+        await file.delete();
+      }
+      await createSamplePayslipFile(payslip, file);
+      
+      // Verify the file was created
+      if (!await checkPathExists(file.uri)) {
+        return {
+          success: false,
+          message: 'Could not prepare file for preview',
+        };
+      }
     }
     
-    const filePath = downloadResult.filePath;
+    // Always use the internal file:// URI for preview (not content:// URIs)
+    const filePath = file.uri;
     const mimeType = getMimeType(payslip.file.type);
     
     // Check if sharing is available (iOS uses this approach)
@@ -227,42 +241,8 @@ export async function previewPayslip(payslip: Payslip, forceRedownload = false):
         };
       }
     } else if (Platform.OS === 'android') {
-      // On Android, use IntentLauncher to open with appropriate app
-      try {
-        // For Android, we need to use a content:// URI
-        // The expo-file-system new API doesn't expose getContentUriAsync
-        // So we use sharing as the fallback
-        if (isSharingAvailable) {
-          await Sharing.shareAsync(filePath, { mimeType });
-          return {
-            success: true,
-            message: 'File opened successfully',
-            filePath,
-          };
-        }
-        
-        // Try intent launcher with file URI
-        await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
-          data: filePath,
-          flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
-          type: mimeType,
-        });
-        return {
-          success: true,
-          message: 'File opened successfully',
-          filePath,
-        };
-      } catch {
-        // Fallback to sharing if intent fails
-        if (isSharingAvailable) {
-          await Sharing.shareAsync(filePath, { mimeType });
-          return {
-            success: true,
-            message: 'File opened via share',
-            filePath,
-          };
-        }
-      }
+      // On Android, download to user-selected folder and open the file
+      return await previewPayslipOnAndroid(payslip, filePath, mimeType);
     }
     
     // Web fallback or unsupported platform
@@ -284,6 +264,106 @@ export async function previewPayslip(payslip: Payslip, forceRedownload = false):
     return {
       success: false,
       message: `Preview failed: ${errorMessage}`,
+    };
+  }
+}
+
+/**
+ * Handle preview on Android - downloads to user-selected folder and opens the file
+ */
+async function previewPayslipOnAndroid(
+  payslip: Payslip,
+  internalFilePath: string,
+  mimeType: string
+): Promise<FileOperationResult> {
+  try {
+    // Request directory permission from user (same as download flow)
+    const permissions = await FileSystemLegacy.StorageAccessFramework.requestDirectoryPermissionsAsync();
+    
+    if (!permissions.granted) {
+      return {
+        success: false,
+        message: 'Storage permission is required to save and open the file',
+      };
+    }
+
+    // Read the internal file
+    const base64 = await FileSystemLegacy.readAsStringAsync(internalFilePath, {
+      encoding: FileSystemLegacy.EncodingType.Base64,
+    });
+
+    const extension = getFileExtension(payslip.file.type);
+    const fileName = `payslip-${payslip.id}.${extension}`;
+
+    // Create file in the user-selected directory
+    const savedFileUri = await FileSystemLegacy.StorageAccessFramework.createFileAsync(
+      permissions.directoryUri,
+      fileName,
+      mimeType
+    );
+
+    // Write data to the new file
+    await FileSystemLegacy.writeAsStringAsync(savedFileUri, base64, {
+      encoding: FileSystemLegacy.EncodingType.Base64,
+    });
+
+    // Now open the file with an appropriate viewer
+    try {
+      await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+        data: savedFileUri,
+        flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
+        type: mimeType,
+      });
+      
+      return {
+        success: true,
+        message: 'File saved and opened successfully',
+        filePath: savedFileUri,
+      };
+    } catch (openError) {
+      console.warn('Could not open file directly:', openError);
+      
+      // If we can't open directly, use share sheet as fallback
+      const isSharingAvailable = await Sharing.isAvailableAsync();
+      if (isSharingAvailable) {
+        await Sharing.shareAsync(savedFileUri, {
+          mimeType,
+          dialogTitle: `Open ${fileName}`,
+        });
+        return {
+          success: true,
+          message: 'File saved. Choose an app to open it.',
+          filePath: savedFileUri,
+        };
+      }
+      
+      // File was saved but couldn't be opened
+      return {
+        success: true,
+        message: `File saved to selected folder as ${fileName}`,
+        filePath: savedFileUri,
+      };
+    }
+  } catch (error) {
+    console.warn('Android preview error:', error);
+    
+    // Fallback: use share sheet with internal file
+    const isSharingAvailable = await Sharing.isAvailableAsync();
+    if (isSharingAvailable) {
+      await Sharing.shareAsync(internalFilePath, {
+        mimeType,
+        dialogTitle: `Payslip ${payslip.id}`,
+      });
+      return {
+        success: true,
+        message: 'Choose an option to save or open the file',
+        filePath: internalFilePath,
+      };
+    }
+    
+    return {
+      success: false,
+      message: 'Could not save or open the file',
     };
   }
 }
