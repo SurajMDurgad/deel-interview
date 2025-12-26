@@ -19,6 +19,7 @@ export default function RootLayout() {
             options={{
               headerShown: true,
               title: 'Payslip Details',
+              headerBackTitle: 'Back',
             }}
           />
         </Stack>

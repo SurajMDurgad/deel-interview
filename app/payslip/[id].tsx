@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
@@ -62,14 +62,7 @@ export default function PayslipDetailsScreen() {
 
   if (!payslip) {
     return (
-      <>
-        <Stack.Screen
-        options={{
-          title: 'Payslip Details',
-          headerBackTitle: 'Back',
-        }}
-        />
-        <View
+      <View
           style={[
             styles.container,
             styles.centerContent,
@@ -84,19 +77,11 @@ export default function PayslipDetailsScreen() {
             The requested payslip could not be found
           </Text>
         </View>
-      </>
     );
   }
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: 'Payslip Details',
-          headerBackTitle: 'Back',
-        }}
-      />
-      <ScrollView
+    <ScrollView
         style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={[
           styles.scrollContent,
@@ -265,7 +250,6 @@ export default function PayslipDetailsScreen() {
           </Pressable>
         </View>
       </ScrollView>
-    </>
   );
 }
 
