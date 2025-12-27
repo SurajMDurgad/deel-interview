@@ -107,10 +107,6 @@ npm run android
 ```bash
 # Start the development server
 npx expo start
-
-# Scan QR code with:
-# - iOS: Camera app
-# - Android: Expo Go app
 ```
 
 ---
