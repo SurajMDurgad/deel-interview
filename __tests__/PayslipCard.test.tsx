@@ -19,20 +19,22 @@ describe('PayslipCard', () => {
   it('renders payslip ID', () => {
     render(<PayslipCard payslip={mockPayslip} onPress={mockOnPress} />);
 
-    expect(screen.getByText('PS-2024-001')).toBeTruthy();
+    // Text is inside a container with importantForAccessibility, use includeHiddenElements
+    expect(screen.getByText('PS-2024-001', { includeHiddenElements: true })).toBeTruthy();
   });
 
   it('renders formatted period text', () => {
     render(<PayslipCard payslip={mockPayslip} onPress={mockOnPress} />);
 
     // formatPeriod returns "Jan 1 – 31, 2024" for same month
-    expect(screen.getByText('Jan 1 – 31, 2024')).toBeTruthy();
+    expect(screen.getByText('Jan 1 – 31, 2024', { includeHiddenElements: true })).toBeTruthy();
   });
 
   it('renders PDF file type indicator', () => {
     render(<PayslipCard payslip={mockPayslip} onPress={mockOnPress} />);
 
-    expect(screen.getByText('PDF')).toBeTruthy();
+    // File type badge is hidden from accessibility
+    expect(screen.getByText('PDF', { includeHiddenElements: true })).toBeTruthy();
   });
 
   it('renders IMAGE file type indicator for image payslip', () => {
@@ -43,7 +45,7 @@ describe('PayslipCard', () => {
 
     render(<PayslipCard payslip={imagePayslip} onPress={mockOnPress} />);
 
-    expect(screen.getByText('IMAGE')).toBeTruthy();
+    expect(screen.getByText('IMAGE', { includeHiddenElements: true })).toBeTruthy();
   });
 
   it('calls onPress with payslip when pressed', () => {
@@ -59,8 +61,9 @@ describe('PayslipCard', () => {
   it('has correct accessibility label', () => {
     render(<PayslipCard payslip={mockPayslip} onPress={mockOnPress} />);
 
+    // Updated accessibility label format: "PDF payslip for Jan 1 – 31, 2024, ID PS-2024-001"
     const card = screen.getByLabelText(
-      'Payslip PS-2024-001, period Jan 1 – 31, 2024'
+      'PDF payslip for Jan 1 – 31, 2024, ID PS-2024-001'
     );
     expect(card).toBeTruthy();
   });
@@ -75,7 +78,8 @@ describe('PayslipCard', () => {
   it('renders chevron indicator', () => {
     render(<PayslipCard payslip={mockPayslip} onPress={mockOnPress} />);
 
-    expect(screen.getByText('›')).toBeTruthy();
+    // Chevron is hidden from accessibility
+    expect(screen.getByText('›', { includeHiddenElements: true })).toBeTruthy();
   });
 
   describe('different date ranges', () => {
@@ -90,7 +94,7 @@ describe('PayslipCard', () => {
       render(<PayslipCard payslip={crossMonthPayslip} onPress={mockOnPress} />);
 
       // formatPeriod returns "Jan 15 – Feb 15, 2024" for same year different month
-      expect(screen.getByText('Jan 15 – Feb 15, 2024')).toBeTruthy();
+      expect(screen.getByText('Jan 15 – Feb 15, 2024', { includeHiddenElements: true })).toBeTruthy();
     });
 
     it('renders different year period correctly', () => {
@@ -104,8 +108,7 @@ describe('PayslipCard', () => {
       render(<PayslipCard payslip={crossYearPayslip} onPress={mockOnPress} />);
 
       // formatPeriod returns "Dec 15, 2023 – Jan 15, 2024" for different years
-      expect(screen.getByText('Dec 15, 2023 – Jan 15, 2024')).toBeTruthy();
+      expect(screen.getByText('Dec 15, 2023 – Jan 15, 2024', { includeHiddenElements: true })).toBeTruthy();
     });
   });
 });
-

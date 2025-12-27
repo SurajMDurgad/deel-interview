@@ -11,8 +11,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/theme';
-import { useTheme } from '@/src/context/ThemeContext';
 import { usePayslips } from '@/src/context/PayslipContext';
+import { useTheme } from '@/src/context/ThemeContext';
 import {
   downloadPayslip,
   previewPayslip,
@@ -74,12 +74,21 @@ export default function PayslipDetailsScreen() {
             styles.centerContent,
             { backgroundColor: colors.background },
           ]}
+          accessible={true}
+          accessibilityRole="alert"
+          accessibilityLabel="Payslip not found. The requested payslip could not be found."
         >
-          <Text style={[styles.errorIcon]}>⚠️</Text>
-          <Text style={[styles.errorTitle, { color: colors.text }]}>
+          <Text style={[styles.errorIcon]} accessibilityElementsHidden={true}>⚠️</Text>
+          <Text 
+            style={[styles.errorTitle, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             Payslip Not Found
           </Text>
-          <Text style={[styles.errorSubtitle, { color: colors.icon }]}>
+          <Text 
+            style={[styles.errorSubtitle, { color: colors.icon }]}
+            accessibilityRole="text"
+          >
             The requested payslip could not be found
           </Text>
         </View>
@@ -103,6 +112,9 @@ export default function PayslipDetailsScreen() {
               borderColor: colorScheme === 'dark' ? '#2d3135' : '#e8e8e8',
             },
           ]}
+          accessible={true}
+          accessibilityRole="summary"
+          accessibilityLabel={`${payslip.file.type.toUpperCase()} payslip for ${formatPeriod(payslip.fromDate, payslip.toDate)}`}
         >
           <View style={styles.headerRow}>
             {/* File type badge */}
@@ -114,6 +126,7 @@ export default function PayslipDetailsScreen() {
                     payslip.file.type === 'pdf' ? '#dc3545' : '#28a745',
                 },
               ]}
+              accessibilityElementsHidden={true}
             >
               <Text style={styles.fileTypeBadgeText}>
                 {payslip.file.type.toUpperCase()}
@@ -123,7 +136,11 @@ export default function PayslipDetailsScreen() {
           </View>
 
           {/* Period */}
-          <Text style={[styles.periodText, { color: colors.text }]}>
+          <Text 
+            style={[styles.periodText, { color: colors.text }]}
+            accessibilityRole="header"
+            importantForAccessibility="no-hide-descendants"
+          >
             {formatPeriod(payslip.fromDate, payslip.toDate)}
           </Text>
         </View>
@@ -137,19 +154,33 @@ export default function PayslipDetailsScreen() {
               borderColor: colorScheme === 'dark' ? '#2d3135' : '#e8e8e8',
             },
           ]}
+          accessibilityRole="none"
         >
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text 
+            style={[styles.sectionTitle, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             Details
           </Text>
 
-          <View style={styles.detailRow}>
+          <View 
+            style={styles.detailRow}
+            accessible={true}
+            accessibilityRole="text"
+            accessibilityLabel={`ID: ${payslip.id}`}
+          >
             <Text style={[styles.detailLabel, { color: colors.icon }]}>ID</Text>
             <Text style={[styles.detailValue, { color: colors.text }]}>
               {payslip.id}
             </Text>
           </View>
 
-          <View style={styles.detailRow}>
+          <View 
+            style={styles.detailRow}
+            accessible={true}
+            accessibilityRole="text"
+            accessibilityLabel={`From Date: ${formatDate(payslip.fromDate)}`}
+          >
             <Text style={[styles.detailLabel, { color: colors.icon }]}>
               From Date
             </Text>
@@ -158,7 +189,12 @@ export default function PayslipDetailsScreen() {
             </Text>
           </View>
 
-          <View style={styles.detailRow}>
+          <View 
+            style={styles.detailRow}
+            accessible={true}
+            accessibilityRole="text"
+            accessibilityLabel={`To Date: ${formatDate(payslip.toDate)}`}
+          >
             <Text style={[styles.detailLabel, { color: colors.icon }]}>
               To Date
             </Text>
@@ -167,7 +203,12 @@ export default function PayslipDetailsScreen() {
             </Text>
           </View>
 
-          <View style={styles.detailRow}>
+          <View 
+            style={styles.detailRow}
+            accessible={true}
+            accessibilityRole="text"
+            accessibilityLabel={`File Type: ${payslip.file.type === 'pdf' ? 'PDF Document' : 'Image'}`}
+          >
             <Text style={[styles.detailLabel, { color: colors.icon }]}>
               File Type
             </Text>
@@ -186,8 +227,12 @@ export default function PayslipDetailsScreen() {
               borderColor: colorScheme === 'dark' ? '#2d3135' : '#e8e8e8',
             },
           ]}
+          accessibilityRole="none"
         >
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text 
+            style={[styles.sectionTitle, { color: colors.text }]}
+            accessibilityRole="header"
+          >
             Actions
           </Text>
 
@@ -204,13 +249,17 @@ export default function PayslipDetailsScreen() {
             accessibilityRole="button"
             accessibilityLabel="Download payslip"
             accessibilityHint="Saves the payslip to your device"
+            accessibilityState={{ disabled: isDownloading, busy: isDownloading }}
           >
             {isDownloading ? (
               <ActivityIndicator color={colorScheme === 'dark' ? '#151718' : '#ffffff'} size="small" />
             ) : (
               <>
-                <Text style={styles.actionButtonIcon}>⬇️</Text>
-                <Text style={[styles.actionButtonText, { color: colorScheme === 'dark' ? '#151718' : '#ffffff' }]}>
+                <Text style={styles.actionButtonIcon} accessibilityElementsHidden={true}>⬇️</Text>
+                <Text 
+                  style={[styles.actionButtonText, { color: colorScheme === 'dark' ? '#151718' : '#ffffff' }]}
+                  importantForAccessibility="no-hide-descendants"
+                >
                   Download Payslip
                 </Text>
               </>
@@ -237,17 +286,19 @@ export default function PayslipDetailsScreen() {
             accessibilityRole="button"
             accessibilityLabel="Preview payslip"
             accessibilityHint="Opens the payslip in a viewer"
+            accessibilityState={{ disabled: isPreviewing, busy: isPreviewing }}
           >
             {isPreviewing ? (
               <ActivityIndicator color={colors.tint} size="small" />
             ) : (
               <>
-                <Text style={styles.actionButtonIcon}>👁️</Text>
+                <Text style={styles.actionButtonIcon} accessibilityElementsHidden={true}>👁️</Text>
                 <Text
                   style={[
                     styles.actionButtonText,
                     { color: colors.tint },
                   ]}
+                  importantForAccessibility="no-hide-descendants"
                 >
                   Preview Payslip
                 </Text>

@@ -65,37 +65,39 @@ describe('PayslipDetailsScreen', () => {
     it('renders the period text', () => {
       renderWithProvider();
 
-      expect(screen.getByText('Jan 1 – 31, 2024')).toBeTruthy();
+      // Period text is inside a container with importantForAccessibility
+      expect(screen.getByText('Jan 1 – 31, 2024', { includeHiddenElements: true })).toBeTruthy();
     });
 
     it('renders the payslip ID in details', () => {
       renderWithProvider();
 
-      expect(screen.getByText('PS-2024-001')).toBeTruthy();
+      expect(screen.getByText('PS-2024-001', { includeHiddenElements: true })).toBeTruthy();
     });
 
     it('renders the from date', () => {
       renderWithProvider();
 
-      expect(screen.getByText('Jan 1, 2024')).toBeTruthy();
+      expect(screen.getByText('Jan 1, 2024', { includeHiddenElements: true })).toBeTruthy();
     });
 
     it('renders the to date', () => {
       renderWithProvider();
 
-      expect(screen.getByText('Jan 31, 2024')).toBeTruthy();
+      expect(screen.getByText('Jan 31, 2024', { includeHiddenElements: true })).toBeTruthy();
     });
 
     it('renders PDF file type badge', () => {
       renderWithProvider();
 
-      expect(screen.getByText('PDF')).toBeTruthy();
+      // File type badge is hidden from accessibility
+      expect(screen.getByText('PDF', { includeHiddenElements: true })).toBeTruthy();
     });
 
     it('renders PDF Document text in details', () => {
       renderWithProvider();
 
-      expect(screen.getByText('PDF Document')).toBeTruthy();
+      expect(screen.getByText('PDF Document', { includeHiddenElements: true })).toBeTruthy();
     });
 
     it('renders Details section', () => {
@@ -113,13 +115,15 @@ describe('PayslipDetailsScreen', () => {
     it('renders Download button', () => {
       renderWithProvider();
 
-      expect(screen.getByText('Download Payslip')).toBeTruthy();
+      // Button text is inside a container with importantForAccessibility
+      expect(screen.getByText('Download Payslip', { includeHiddenElements: true })).toBeTruthy();
     });
 
     it('renders Preview button', () => {
       renderWithProvider();
 
-      expect(screen.getByText('Preview Payslip')).toBeTruthy();
+      // Button text is inside a container with importantForAccessibility
+      expect(screen.getByText('Preview Payslip', { includeHiddenElements: true })).toBeTruthy();
     });
   });
 
@@ -131,13 +135,14 @@ describe('PayslipDetailsScreen', () => {
     it('renders IMAGE file type badge', () => {
       renderWithProvider();
 
-      expect(screen.getByText('IMAGE')).toBeTruthy();
+      // File type badge is hidden from accessibility
+      expect(screen.getByText('IMAGE', { includeHiddenElements: true })).toBeTruthy();
     });
 
     it('renders Image text in file type details', () => {
       renderWithProvider();
 
-      expect(screen.getByText('Image')).toBeTruthy();
+      expect(screen.getByText('Image', { includeHiddenElements: true })).toBeTruthy();
     });
   });
 
@@ -161,7 +166,8 @@ describe('PayslipDetailsScreen', () => {
     it('renders warning emoji', () => {
       renderWithProvider();
 
-      expect(screen.getByText('⚠️')).toBeTruthy();
+      // Warning emoji is hidden from accessibility
+      expect(screen.getByText('⚠️', { includeHiddenElements: true })).toBeTruthy();
     });
   });
 
@@ -169,7 +175,8 @@ describe('PayslipDetailsScreen', () => {
     it('calls downloadPayslip when download button is pressed', async () => {
       renderWithProvider();
 
-      const downloadButton = screen.getByText('Download Payslip');
+      // Use accessibility label to find the button
+      const downloadButton = screen.getByLabelText('Download payslip');
       fireEvent.press(downloadButton);
 
       await waitFor(() => {
@@ -180,7 +187,7 @@ describe('PayslipDetailsScreen', () => {
     it('passes the correct payslip to downloadPayslip', async () => {
       renderWithProvider();
 
-      const downloadButton = screen.getByText('Download Payslip');
+      const downloadButton = screen.getByLabelText('Download payslip');
       fireEvent.press(downloadButton);
 
       await waitFor(() => {
@@ -194,7 +201,7 @@ describe('PayslipDetailsScreen', () => {
     it('does not show alert after successful download (iOS shows its own)', async () => {
       renderWithProvider();
 
-      const downloadButton = screen.getByText('Download Payslip');
+      const downloadButton = screen.getByLabelText('Download payslip');
       fireEvent.press(downloadButton);
 
       await waitFor(() => {
@@ -214,7 +221,7 @@ describe('PayslipDetailsScreen', () => {
 
       renderWithProvider();
 
-      const downloadButton = screen.getByText('Download Payslip');
+      const downloadButton = screen.getByLabelText('Download payslip');
       fireEvent.press(downloadButton);
 
       await waitFor(() => {
@@ -237,7 +244,7 @@ describe('PayslipDetailsScreen', () => {
     it('calls previewPayslip when preview button is pressed', async () => {
       renderWithProvider();
 
-      const previewButton = screen.getByText('Preview Payslip');
+      const previewButton = screen.getByLabelText('Preview payslip');
       fireEvent.press(previewButton);
 
       await waitFor(() => {
@@ -248,7 +255,7 @@ describe('PayslipDetailsScreen', () => {
     it('passes the correct payslip to previewPayslip', async () => {
       renderWithProvider();
 
-      const previewButton = screen.getByText('Preview Payslip');
+      const previewButton = screen.getByLabelText('Preview payslip');
       fireEvent.press(previewButton);
 
       await waitFor(() => {
@@ -290,26 +297,25 @@ describe('PayslipDetailsScreen', () => {
     it('renders ID label', () => {
       renderWithProvider();
 
-      expect(screen.getByText('ID')).toBeTruthy();
+      expect(screen.getByText('ID', { includeHiddenElements: true })).toBeTruthy();
     });
 
     it('renders From Date label', () => {
       renderWithProvider();
 
-      expect(screen.getByText('From Date')).toBeTruthy();
+      expect(screen.getByText('From Date', { includeHiddenElements: true })).toBeTruthy();
     });
 
     it('renders To Date label', () => {
       renderWithProvider();
 
-      expect(screen.getByText('To Date')).toBeTruthy();
+      expect(screen.getByText('To Date', { includeHiddenElements: true })).toBeTruthy();
     });
 
     it('renders File Type label', () => {
       renderWithProvider();
 
-      expect(screen.getByText('File Type')).toBeTruthy();
+      expect(screen.getByText('File Type', { includeHiddenElements: true })).toBeTruthy();
     });
   });
 });
-

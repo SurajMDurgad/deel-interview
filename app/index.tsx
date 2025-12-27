@@ -43,12 +43,23 @@ export default function PayslipListScreen() {
 
   const ListEmptyComponent = useCallback(
     () => (
-      <View style={styles.emptyContainer}>
-        <Text style={[styles.emptyIcon]}>📄</Text>
-        <Text style={[styles.emptyTitle, { color: colors.text }]}>
+      <View 
+        style={styles.emptyContainer}
+        accessible={true}
+        accessibilityRole="alert"
+        accessibilityLabel={`No payslips found. ${filterText ? 'Try adjusting your search terms' : 'No payslips available yet'}`}
+      >
+        <Text style={[styles.emptyIcon]} accessibilityElementsHidden={true}>📄</Text>
+        <Text 
+          style={[styles.emptyTitle, { color: colors.text }]}
+          accessibilityRole="header"
+        >
           No Payslips Found
         </Text>
-        <Text style={[styles.emptySubtitle, { color: colors.icon }]}>
+        <Text 
+          style={[styles.emptySubtitle, { color: colors.icon }]}
+          accessibilityRole="text"
+        >
           {filterText
             ? 'Try adjusting your search terms'
             : 'No payslips available yet'}
@@ -60,11 +71,16 @@ export default function PayslipListScreen() {
 
   const ListHeaderComponent = useCallback(
     () => (
-      <View style={styles.header}>
+      <View style={styles.header} accessibilityRole="none">
         <FilterInput value={filterText} onChangeText={setFilterText} />
         <View style={styles.controlsRow}>
           <SortPicker value={sortOrder} onChange={setSortOrder} />
-          <Text style={[styles.countText, { color: colors.icon }]}>
+          <Text 
+            style={[styles.countText, { color: colors.icon }]}
+            accessibilityRole="text"
+            accessibilityLabel={`${filteredPayslips.length} ${filteredPayslips.length !== 1 ? 'payslips' : 'payslip'} found`}
+            accessibilityLiveRegion="polite"
+          >
             {filteredPayslips.length} payslip
             {filteredPayslips.length !== 1 ? 's' : ''}
           </Text>
@@ -83,7 +99,12 @@ export default function PayslipListScreen() {
     >
       {/* Screen Title with Theme Toggle */}
       <View style={styles.titleContainer}>
-        <Text style={[styles.title, { color: colors.text }]}>Payslips</Text>
+        <Text 
+          style={[styles.title, { color: colors.text }]}
+          accessibilityRole="header"
+        >
+          Payslips
+        </Text>
         <Pressable
           onPress={toggleTheme}
           style={({ pressed }) => [
@@ -95,8 +116,11 @@ export default function PayslipListScreen() {
           ]}
           accessibilityLabel={`Switch to ${isDark ? 'light' : 'dark'} mode`}
           accessibilityRole="button"
+          accessibilityHint={`Currently in ${isDark ? 'dark' : 'light'} mode`}
         >
-          <Text style={styles.themeToggleIcon}>{isDark ? '☀️' : '🌙'}</Text>
+          <Text style={styles.themeToggleIcon} accessibilityElementsHidden={true}>
+            {isDark ? '☀️' : '🌙'}
+          </Text>
         </Pressable>
       </View>
 

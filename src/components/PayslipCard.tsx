@@ -1,9 +1,9 @@
+import { Colors } from '@/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import React from 'react';
-import { StyleSheet, Pressable, View, Text } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Payslip } from '../types/payslip';
 import { formatPeriod } from '../utils/dateUtils';
-import { useTheme } from '@/src/context/ThemeContext';
-import { Colors } from '@/constants/theme';
 
 interface PayslipCardProps {
   payslip: Payslip;
@@ -33,11 +33,11 @@ export function PayslipCard({ payslip, onPress }: PayslipCardProps) {
       ]}
       onPress={handlePress}
       accessibilityRole="button"
-      accessibilityLabel={`Payslip ${payslip.id}, period ${formatPeriod(payslip.fromDate, payslip.toDate)}`}
+      accessibilityLabel={`${payslip.file.type.toUpperCase()} payslip for ${formatPeriod(payslip.fromDate, payslip.toDate)}, ID ${payslip.id}`}
       accessibilityHint="Double tap to view payslip details"
     >
       <View style={styles.content}>
-        <View style={styles.leftSection}>
+        <View style={styles.leftSection} accessibilityElementsHidden={true}>
           {/* File type indicator */}
           <View
             style={[
@@ -51,7 +51,7 @@ export function PayslipCard({ payslip, onPress }: PayslipCardProps) {
           </View>
         </View>
 
-        <View style={styles.mainContent}>
+        <View style={styles.mainContent} importantForAccessibility="no-hide-descendants">
           {/* Period */}
           <Text style={[styles.periodText, { color: colors.text }]}>
             {formatPeriod(payslip.fromDate, payslip.toDate)}
@@ -63,8 +63,8 @@ export function PayslipCard({ payslip, onPress }: PayslipCardProps) {
           </Text>
         </View>
 
-        {/* Chevron */}
-        <View style={styles.chevronContainer}>
+        {/* Chevron - decorative, hide from accessibility */}
+        <View style={styles.chevronContainer} accessibilityElementsHidden={true}>
           <Text style={[styles.chevron, { color: colors.icon }]}>›</Text>
         </View>
       </View>

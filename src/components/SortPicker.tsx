@@ -22,8 +22,18 @@ export function SortPicker({ value, onChange }: SortPickerProps) {
   ];
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.label, { color: colors.icon }]}>Sort by:</Text>
+    <View 
+      style={styles.container}
+      accessible={true}
+      accessibilityRole="radiogroup"
+      accessibilityLabel={`Sort order: ${value === 'newest' ? 'Newest first' : 'Oldest first'}`}
+    >
+      <Text 
+        style={[styles.label, { color: colors.icon }]}
+        accessibilityElementsHidden={true}
+      >
+        Sort by:
+      </Text>
       <View
         style={[
           styles.buttonGroup,
@@ -31,6 +41,7 @@ export function SortPicker({ value, onChange }: SortPickerProps) {
             backgroundColor: colorScheme === 'dark' ? '#2d3135' : '#f0f0f0',
           },
         ]}
+        accessible={false}
       >
         {options.map(option => {
           const isSelected = value === option.value;
@@ -44,9 +55,10 @@ export function SortPicker({ value, onChange }: SortPickerProps) {
                 },
               ]}
               onPress={() => onChange(option.value)}
-              accessibilityRole="button"
-              accessibilityState={{ selected: isSelected }}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: isSelected }}
               accessibilityLabel={`Sort by ${option.label}`}
+              accessibilityHint={isSelected ? 'Currently selected' : 'Double tap to select'}
             >
               <Text
                 style={[
@@ -59,6 +71,7 @@ export function SortPicker({ value, onChange }: SortPickerProps) {
                       : colors.text,
                   },
                 ]}
+                importantForAccessibility="no-hide-descendants"
               >
                 {option.label}
               </Text>

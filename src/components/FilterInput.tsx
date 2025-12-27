@@ -25,7 +25,7 @@ export function FilterInput({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} accessibilityRole="search">
       <View
         style={[
           styles.inputContainer,
@@ -35,8 +35,13 @@ export function FilterInput({
           },
         ]}
       >
-        {/* Search icon */}
-        <Text style={[styles.searchIcon, { color: colors.icon }]}>🔍</Text>
+        {/* Search icon - decorative, hide from accessibility */}
+        <Text 
+          style={[styles.searchIcon, { color: colors.icon }]}
+          accessibilityElementsHidden={true}
+        >
+          🔍
+        </Text>
 
         <TextInput
           style={[styles.input, { color: colors.text }]}
@@ -49,6 +54,7 @@ export function FilterInput({
           clearButtonMode="never"
           accessibilityLabel="Search payslips"
           accessibilityHint="Enter text to filter payslips by year, month, or ID"
+          accessibilityValue={{ text: value || 'empty' }}
         />
 
         {/* Clear button */}
@@ -58,12 +64,14 @@ export function FilterInput({
             style={styles.clearButton}
             accessibilityRole="button"
             accessibilityLabel="Clear search"
+            accessibilityHint="Removes all search text"
           >
             <View
               style={[
                 styles.clearIcon,
                 { backgroundColor: colors.icon },
               ]}
+              accessibilityElementsHidden={true}
             >
               <Text style={styles.clearIconText}>×</Text>
             </View>
