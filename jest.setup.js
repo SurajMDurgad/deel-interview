@@ -21,11 +21,6 @@ jest.mock('expo-router', () => ({
   Link: ({ children }) => children,
 }));
 
-// Mock useColorScheme hook
-jest.mock('@/hooks/use-color-scheme', () => ({
-  useColorScheme: () => 'light',
-}));
-
 // Mock ThemeContext
 jest.mock('@/src/context/ThemeContext', () => ({
   useTheme: () => ({

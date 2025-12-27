@@ -2,8 +2,6 @@ import {
   compareDates,
   formatDate,
   formatPeriod,
-  getUniqueYears,
-  getYear,
 } from '@/src/utils/dateUtils';
 
 describe('formatDate', () => {
@@ -45,41 +43,6 @@ describe('formatPeriod', () => {
     expect(formatPeriod('invalid', '2024-01-31')).toBe('Invalid Period');
     expect(formatPeriod('2024-01-01', 'invalid')).toBe('Invalid Period');
     expect(formatPeriod('invalid', 'also-invalid')).toBe('Invalid Period');
-  });
-});
-
-describe('getYear', () => {
-  it('extracts year from valid ISO date', () => {
-    expect(getYear('2024-01-15')).toBe(2024);
-    expect(getYear('2023-12-25')).toBe(2023);
-    expect(getYear('1999-06-30')).toBe(1999);
-  });
-
-  it('returns null for invalid dates', () => {
-    expect(getYear('invalid')).toBeNull();
-    expect(getYear('')).toBeNull();
-    expect(getYear('not-a-date')).toBeNull();
-  });
-});
-
-describe('getUniqueYears', () => {
-  it('returns unique years sorted in descending order', () => {
-    const dates = ['2024-01-15', '2023-06-01', '2024-12-31', '2022-03-10'];
-    expect(getUniqueYears(dates)).toEqual([2024, 2023, 2022]);
-  });
-
-  it('handles empty array', () => {
-    expect(getUniqueYears([])).toEqual([]);
-  });
-
-  it('filters out invalid dates', () => {
-    const dates = ['2024-01-15', 'invalid', '2023-06-01', ''];
-    expect(getUniqueYears(dates)).toEqual([2024, 2023]);
-  });
-
-  it('handles array with all same years', () => {
-    const dates = ['2024-01-01', '2024-06-15', '2024-12-31'];
-    expect(getUniqueYears(dates)).toEqual([2024]);
   });
 });
 

@@ -56,37 +56,6 @@ export function formatPeriod(fromDate: string, toDate: string): string {
 }
 
 /**
- * Extract the year from an ISO date string
- * @param isoDate - ISO date string
- * @returns Year as a number, or null if invalid
- */
-export function getYear(isoDate: string): number | null {
-  const date = new Date(isoDate);
-  if (isNaN(date.getTime())) {
-    return null;
-  }
-  return date.getFullYear();
-}
-
-/**
- * Get an array of unique years from a list of dates
- * @param dates - Array of ISO date strings
- * @returns Sorted array of unique years (descending)
- */
-export function getUniqueYears(dates: string[]): number[] {
-  const years = new Set<number>();
-  
-  dates.forEach(date => {
-    const year = getYear(date);
-    if (year !== null) {
-      years.add(year);
-    }
-  });
-  
-  return Array.from(years).sort((a, b) => b - a);
-}
-
-/**
  * Compare two ISO date strings for sorting
  * @param dateA - First date
  * @param dateB - Second date

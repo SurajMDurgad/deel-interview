@@ -415,35 +415,6 @@ async function previewPayslipOnAndroid(
 }
 
 /**
- * Delete a downloaded payslip file
- */
-export async function deleteDownloadedPayslip(payslip: Payslip): Promise<FileOperationResult> {
-  try {
-    const file = getPayslipFile(payslip);
-    
-    if (!file.exists) {
-      return {
-        success: true,
-        message: 'File was already deleted',
-      };
-    }
-    
-    await file.delete();
-    
-    return {
-      success: true,
-      message: 'File deleted successfully',
-    };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return {
-      success: false,
-      message: `Delete failed: ${errorMessage}`,
-    };
-  }
-}
-
-/**
  * Show an alert with the result of a file operation
  */
 export function showFileOperationAlert(result: FileOperationResult, title: string = 'Download'): void {
