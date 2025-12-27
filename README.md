@@ -139,7 +139,7 @@ npx expo start
 With more time, I would:
 
 1. **Add actual PDF/image payslip assets** — Currently using the requirements PDF as a placeholder
-2. **Implement offline-first architecture** — Cache payslips locally with SQLite or WatermelonDB
+2. **Implement offline-first architecture** — Cache payslips locally with MMKV or local storage
 3. **Add biometric authentication** — Protect sensitive payslip data with Face ID/Touch ID
 4. **PDF inline preview** — Use `react-native-pdf` or WebView for in-app viewing
 5. **Add animations** — Use Reanimated for smooth list transitions and micro-interactions
