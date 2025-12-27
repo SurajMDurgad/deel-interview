@@ -2,18 +2,10 @@
 
 // Import jest-native matchers
 import '@testing-library/react-native';
+import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
 
+jest.mock('react-native-safe-area-context', () => mockSafeAreaContext);
 
-// Mock react-native-safe-area-context
-jest.mock('react-native-safe-area-context', () => {
-  const insets = { top: 0, bottom: 0, left: 0, right: 0 };
-  return {
-    SafeAreaProvider: ({ children }) => children,
-    SafeAreaView: ({ children }) => children,
-    useSafeAreaInsets: () => insets,
-    useSafeAreaFrame: () => ({ x: 0, y: 0, width: 375, height: 812 }),
-  };
-});
 
 // Mock expo-router
 jest.mock('expo-router', () => ({
