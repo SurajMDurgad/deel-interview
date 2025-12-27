@@ -1,7 +1,7 @@
-import React from 'react';
-import { StyleSheet, View, TextInput, Pressable, Text } from 'react-native';
-import { useTheme } from '@/src/context/ThemeContext';
 import { Colors } from '@/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
+import React from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 interface FilterInputProps {
   value: string;
