@@ -122,9 +122,7 @@ npx expo start
 | `npm start` | Start Expo development server |
 | `npm run ios` | Build and run on iOS simulator |
 | `npm run android` | Build and run on Android emulator |
-| `npm run web` | Start web version |
 | `npm run lint` | Run ESLint |
-| `npm run reset-project` | Reset to blank project template |
 
 ---
 
