@@ -126,3 +126,25 @@ npx expo start
 | `npm run lint` | Run ESLint |
 | `npm run reset-project` | Reset to blank project template |
 
+---
+
+## ⚠️ Known Limitations
+
+- Payslip files all reference the same sample PDF (as per requirements)
+- No persistent storage for downloaded file history
+- No biometric/PIN authentication for sensitive data
+
+---
+
+## 🔮 Future Improvements
+
+With more time, I would:
+
+1. **Add actual PDF/image payslip assets** — Currently using the requirements PDF as a placeholder
+2. **Implement offline-first architecture** — Cache payslips locally with SQLite or WatermelonDB
+3. **Add biometric authentication** — Protect sensitive payslip data with Face ID/Touch ID
+4. **PDF inline preview** — Use `react-native-pdf` or WebView for in-app viewing
+5. **Add animations** — Use Reanimated for smooth list transitions and micro-interactions
+6. **Implement push notifications** — Notify users when new payslips are available
+7. **Add E2E tests** — Detox or Maestro for full integration testing
+8. **Localization** — Support multiple languages and date formats
